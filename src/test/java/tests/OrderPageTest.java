@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import pageObject.MainPage;
 import pageObject.OrderPage;
 
@@ -21,16 +20,11 @@ public class OrderPageTest {
 
     @ParameterizedTest
     @MethodSource("orderDataProvider")
-    public void orderPositiveTest(String browser, String name, String surname, String address,
+    public void orderPositiveTest(String name, String surname, String address,
                                   String phone, String day, String rentPeriod, String color, boolean useTopButton) {
-        // Инициализация драйвера по браузеру
-        if (browser.equals("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
-        } else if (browser.equals("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            driver = new FirefoxDriver();
-        }
+
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
 
         driver.get("https://qa-scooter.praktikum-services.ru/");
         MainPage mainPage = new MainPage(driver);
@@ -69,8 +63,8 @@ public class OrderPageTest {
 
     static Stream<Arguments> orderDataProvider() {
         return Stream.of(
-                Arguments.of("chrome", "Глаша", "Петрова", "ул. Цветочная, д. 5", "+79998887766", "2", "сутки", "grey", true),
-                Arguments.of("firefox", "Дмитрий", "Смирнов", "ул. Яблоневая, д. 12", "+79997776655", "5", "двое суток", "black", false)
+                Arguments.of("Глаша", "Петрова", "ул. Цветочная, д. 5", "+79998887766", "2", "сутки", "grey", true),
+                Arguments.of("Дмитрий", "Смирнов", "ул. Яблоневая, д. 12", "+79997776655", "5", "двое суток", "black", false)
         );
     }
 

@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import pageObject.MainPage;
 
 import java.util.stream.Stream;
@@ -17,68 +16,33 @@ public class MainPageTest {
 
     private WebDriver driver;
 
-    static Stream<Arguments> browserProvider() {
+    static Stream<Arguments> faqProvider() {
         return Stream.of(
-                Arguments.of("chrome"),
-                Arguments.of("firefox")
+                Arguments.of(0, "Сутки — 400 рублей. Оплата курьеру — наличными или картой."),
+                Arguments.of(1, "Пока что у нас так: один заказ — один самокат. Если хотите покататься с друзьями, можете просто сделать несколько заказов — один за другим."),
+                Arguments.of(2, "Допустим, вы оформляете заказ на 8 мая. Мы привозим самокат 8 мая в течение дня. Отсчёт времени аренды начинается с момента, когда вы оплатите заказ курьеру."),
+                Arguments.of(3, "Только начиная с завтрашнего дня. Но скоро станем расторопнее."),
+                Arguments.of(4, "Пока что нет! Но если что-то срочное — всегда можно позвонить в поддержку по номеру 1010."),
+                Arguments.of(5, "Самокат приезжает к вам с полной зарядкой. Зарядка не понадобится."),
+                Arguments.of(6, "Да, пока самокат не привезли. Штрафа не будет, объясните причину и отмените заказ."),
+                Arguments.of(7, "Да, доставим. Стоимость доставки за МКАД — обсуждается индивидуально.")
         );
     }
 
-    static Stream<Arguments> faqIndexProvider() {
-        return Stream.of(
-                Arguments.of("chrome", 0),
-                Arguments.of("chrome", 1),
-                Arguments.of("chrome", 2),
-                Arguments.of("chrome", 3),
-                Arguments.of("chrome", 4),
-                Arguments.of("chrome", 5),
-                Arguments.of("chrome", 6),
-                Arguments.of("chrome", 7),
-                Arguments.of("firefox", 0),
-                Arguments.of("firefox", 1),
-                Arguments.of("firefox", 2),
-                Arguments.of("firefox", 3),
-                Arguments.of("firefox", 4),
-                Arguments.of("firefox", 5),
-                Arguments.of("firefox", 6),
-                Arguments.of("firefox", 7)
-        );
-    }
-
-    // Тест: главная страница открывается
     @ParameterizedTest
-    @MethodSource("browserProvider")
-    void testOpenMainPage(String browser) {
-        if (browser.equals("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
-        } else if (browser.equals("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            driver = new FirefoxDriver();
-        }
-
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-    }
-
-    // Тест: FAQ — ответ появляется
-    @ParameterizedTest
-    @MethodSource("faqIndexProvider")
-    void testFaqAnswerVisible(String browser, int index) {
-        if (browser.equals("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            driver = new ChromeDriver();
-        } else if (browser.equals("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            driver = new FirefoxDriver();
-        }
+    @MethodSource("faqProvider")
+    void testFaqAnswerText(int index, String expectedAnswer) {
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
 
         driver.get("https://qa-scooter.praktikum-services.ru/");
         MainPage mainPage = new MainPage(driver);
 
         mainPage.closeBannerIfVisible();
         mainPage.scrollToFaqAndClick(index);
-        String answer = mainPage.getFaqAnswerTextWithWait(index);
-        Assertions.assertFalse(answer.isEmpty(), "Ответ на вопрос пустой");
+        String actualAnswer = mainPage.getFaqAnswerTextWithWait(index);
+
+        Assertions.assertEquals(expectedAnswer, actualAnswer, "Текст ответа не совпадает с ожидаемым");
     }
 
     @AfterEach
